@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Проект "Комменты"</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  
+  <body>
+    <div class="container">
+      <ul class="comments">
+        <li class="comment">
+          <div class="comment-header">
+            <div>Глеб Фокин</div>
+            <div>12.02.22 12:18</div>
+          </div>
+          <div class="comment-body">
+            <div class="comment-text">
+              Это будет первый комментарий на этой странице
+            </div>
+          </div>
+          <div class="comment-footer">
+            <div class="likes">
+              <span class="likes-counter">3</span>
+              <button class="like-button"></button>
+            </div>
+          </div>
+        </li>
+        <li class="comment">
+          <div class="comment-header">
+            <div>Варвара Н.</div>
+            <div>13.02.22 19:22</div>
+          </div>
+          <div class="comment-body">
+            <div class="comment-text">
+              Мне нравится как оформлена эта страница! ❤
+            </div>
+          </div>
+          <div class="comment-footer">
+            <div class="likes">
+              <span class="likes-counter">75</span>
+              <button class="like-button -active-like"></button>
+            </div>
+          </div>
+        </li>
+      </ul>
+      <div class="add-form">
+        <input
+          type="text"
+          class="add-form-name"
+          placeholder="Введите Ваше имя"
+        />
+        <textarea
+          type="textarea"
+          class="add-form-text"
+          placeholder="Введите Ваш комментарий"
+          rows="4"
+        ></textarea>
+        <div class="add-form-row">
+          <button class="add-form-button">Написать</button>
+        </div>
+      </div>
+    </div>
+  
+    <script>
+    "use strict";
+
+// Массив данных с комментариями
+const commentsData = [
+  { name: "Глеб Фокин", date: "12.02.22 12:18", text: "Это будет первый комментарий на этой странице", likes: 3, liked: false },
+  { name: "Варвара Н.", date: "13.02.22 19:22", text: "Мне нравится как оформлена эта страница! ❤", likes: 75, liked: true }
+];
+
+// Функция для рендеринга списка комментариев
+function renderComments() {
+  commentsList.innerHTML = ""; // Очищаем список комментариев
+
+  commentsData.forEach((comment, index) => {
+    const newComment = document.createElement("li");
+    newComment.classList.add("comment");
+
+    newComment.innerHTML = `
+      <div class="comment-header">
+        <div>${comment.name}</div>
+        <div>${comment.date}</div>
+      </div>
+      <div class="comment-body">
+        <div class="comment-text">
+          ${comment.text}
+        </div>
+      </div>
+      <div class="comment-footer">
+        <div class="likes">
+          <span class="likes-counter">${comment.likes}</span>
+          <button class="like-button ${comment.liked ? '-active-like' : ''}"></button>
+        </div>
+      </div>
+    `;
+
+    commentsList.appendChild(newComment);
+
+    // Находим кнопку лайка для текущего комментария
+    const likeButton = newComment.querySelector(".like-button");
+
+    // Добавляем обработчик события для кнопки лайка
+    likeButton.addEventListener("click", function () {
+      if (comment.liked) {
+        comment.likes--;
+      } else {
+        comment.likes++;
+      }
+      comment.liked = !comment.liked;
+      renderComments(); // Перерисовываем комментарии после изменения
+    });
+  });
+}
+
+// Получаем кнопку "Написать" и список комментариев
+const addButton = document.querySelector(".add-form-button");
+const commentsList = document.querySelector(".comments");
+const nameInput = document.querySelector(".add-form-name");
+const textInput = document.querySelector(".add-form-text");
+
+// Добавляем обработчик события на кнопку "Написать"
+addButton.addEventListener("click", function () {
+  const name = nameInput.value.trim();
+  const text = textInput.value.trim();
+
+  if (name !== "" && text !== "") {
+    commentsData.push({ name: name, date: new Date().toLocaleString(), text: text, likes: 0, liked: false });
+    renderComments(); // Перерисовываем комментарии после добавления нового
+    nameInput.value = "";
+    textInput.value = "";
+  } else {
+    alert('Пожалуйста, заполните оба поля');
+  }
+});
+
+// Инициализируем рендеринг комментариев при загрузке страницы
+renderComments();
+    </script>
+  </body>
+</html>
