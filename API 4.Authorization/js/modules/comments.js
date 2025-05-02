@@ -1,54 +1,50 @@
-// Импорт зависимостей
 import { getComments, postComment, user } from './api.js';
 import { renderComments } from './render.js';
 import { initHandlers } from './handlers.js';
 import { render_form } from './render_form.js';
 
-// Глобальное хранилище комментариев
 export let commentsData = [];
 
-// Основная функция инициализации приложения
 export const initApp = () => {
-  // Создание индикатора загрузки
-  const loader = document.createElement("div");
-  loader.classList.add("loader");
-  loader.innerText = "Пожалуйста подождите, комментарии загружаются";
-  document.body.appendChild(loader);
+  // Очистка предыдущих элементов
+  document.querySelector('.auth-form')?.remove();
+  document.querySelector('#login-text_id')?.remove();
 
-  // Загрузка комментариев и инициализация обработчиков
+  const loader = document.createElement("div");
+  loader.className = "loader";
+  loader.textContent = "Загрузка комментариев...";
+  document.body.append(loader);
+
   loadComments()
     .then(() => {
-      document.body.removeChild(loader);
-      if (user) {
-        render_form ()
-      }
-      initHandlers(renderComments, loadComments); 
-})
-    .catch((error) => {
-      console.error("Error initializing app:", error);
-      document.body.removeChild(loader);
-    });
+      if (user) render_form();
+      initHandlers(renderComments);
+    })
+    .catch(error => {
+      alert(`Ошибка загрузки: ${error.message}`);
+    })
+    .finally(() => loader.remove());
 };
 
-// Функция загрузки и обработки комментариев
 export const loadComments = () => {
   return getComments()
-    .then((data) => {
-      // Преобразование данных от API в нужный формат
+    .then(data => {
       commentsData = data.comments.map(comment => ({
-        name: comment.author.name,
-        date: new Date(comment.date).toLocaleString(),
-        text: comment.text,
-        likes: comment.likes,
-        liked: false // Флаг лайка для UI
+        name: comment.author.name || "Аноним",
+        date: new Date(comment.date).toLocaleString() || new Date().toLocaleString(),
+        text: comment.text || "",
+        likes: Number(comment.likes) || 0,
+        liked: false
       }));
       renderComments(commentsData);
+      return commentsData;
     });
 };
 
-// Функция добавления нового комментария
 export const addComment = (name, text) => {
-  return postComment(name, text, user
-  )
-    .then(() => loadComments()); // Перезагрузка списка после успешной отправки
+  return postComment(name, text, user)
+    .then(loadComments)
+    .catch(error => {
+      throw new Error(`Ошибка отправки: ${error.message}`);
+    });
 };

@@ -1,6 +1,6 @@
 // Базовый URL API для работы с комментариями
 const API_URL = "https://wedev-api.sky.pro/api/v2/zal-zal/comments";
-const AUTH_URL = " https://wedev-api.sky.pro/api/user/login";
+const AUTH_URL = "https://wedev-api.sky.pro/api/user/login";
 export let user = null;
 // Функция для получения списка комментариев с сервера
 export function set_user(value) {
